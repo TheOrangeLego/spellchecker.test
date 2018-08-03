@@ -58,9 +58,10 @@ end
 
 fun edits1(word):
   letters = 'abcdefghijklmnopqrstuvwxyz'
+  word-length = string-length( word )
   splits = for map(i from range(0, string-length(word) + 1)):
     { string-substring(word, 0, i);
-      string-substring(word, i, string-length(word)) }
+      string-substring(word, i, word-length) }
   end.filter({({L;R}): string-length(R) > 0})
   deletes = for map({L; R} from splits):
     L + string-substring(R, 1, string-length(R))
@@ -92,7 +93,7 @@ end
 
 # correct = words(F.input-file("correct.txt").read-file())
 # e1 = words2(F.input-file("edit1.txt").read-file())
-e2 = words2(F.input-file("edit2.txt").read-file())
+e2 = words2(F.input-file("edits2.txt").read-file())
 wrong = words2(F.input-file("wrong.txt").read-file())
 
 fun testTiming( words-list ) block:

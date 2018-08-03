@@ -50,25 +50,15 @@ def testTiming( words ):
         # assert( correction( words[wordRange] ) in WORDS ), ( "Word not in dictionary: " + words[wordRange] )
     print ( time.time() - start ) / 10
 
-    print "83 words"
+    print "100 words"
     start = time.time()
     for word in words:
         correction( word )
         # assert( correction( word ) in WORDS ), ( "Word not in dictionary: " + word )
-    print ( time.time() - start ) / 83
+    print ( time.time() - start ) / 100
 
-# CORRECT = re.findall( r'\w+', ( open( 'correct.txt' ).read() ).lower() )
-# E1 = re.findall( r'\w+', ( open( 'edit1.txt' ).read() ).lower() )
-E2 = re.findall( r'\w+', ( open( 'edit2.txt' ).read() ).lower() )
+E2 = re.findall( r'\w+', ( open( 'edits2.txt' ).read() ).lower() )
 WRONG = re.findall( r'\w+', ( open( 'wrong.txt' ).read() ).lower() )
-
-""" print "Correct word corrections"
-testTiming( CORRECT )
-print ""
-
-print "Edit 1 corrections"
-testTiming( E1 )
-print "" """
 
 print "Edit 2 corrections"
 testTiming( E2 )

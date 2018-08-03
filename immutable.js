@@ -101,8 +101,8 @@ correction = function( word ) {
 
 // CORRECT = fs.readFileSync( path.join( __dirname, 'correct.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
 // E1 = fs.readFileSync( path.join( __dirname, 'edit1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
-E2 = fs.readFileSync( path.join( __dirname, 'edit2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
-WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
+E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
 testTiming = function( words ) {
   console.log( "Single word" );
@@ -113,14 +113,13 @@ testTiming = function( words ) {
   console.log( "10 words" );
   start = process.hrtime();
   for ( index = 0; index < 10; index++ )
-    console.log( index );
     correction( words[index] );
   console.log( process.hrtime( start ) );
 
   console.log( "100 words" );
   start = process.hrtime();
-  for ( word in words )
-    correction( word );
+  for ( index = 0; index < 100; index++ )
+    correction( words[index] );
   console.log( process.hrtime( start ) );
 };
 

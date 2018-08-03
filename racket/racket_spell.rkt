@@ -37,18 +37,19 @@
    ( filter ( lambda ( word ) ( hash-has-key? WORDS word ) ) words ) )
 
 ( define ( edits1 word )
-   ( let ([letters "abcdefghijklmnopqrstuvwxyz"])
+   ( let ([letters "abcdefghijklmnopqrstuvwxyz"]
+          [word-length ( string-length word )])
       ( append
-          ( for/list ([i ( range ( string-length word ) )]) ( string-append ( substring word 0 i ) ( substring word ( + i 1 ) ( string-length word ) ) ) )
-          ( for/list ([i ( range ( - ( string-length word ) 1 ) )]) ( string-append ( substring word 0 i ) ( string-append ( string ( string-ref word ( + i 1 ) ) ( string-ref word i ) ) ( substring word ( + i 2 ) ( string-length word ) ) ) ) )
-          ( for/fold ([acc '()]) ([i ( range ( string-length word ) )] )
-             ( append ( for/list ([letter letters]) ( let ([word-copy ( string-copy word )]) ( string-set! word-copy i letter ) word-copy ) ) acc ) )
-          ( for/fold ([acc '()]) ([i ( range ( + 1 ( string-length word ) ) )] )
-             ( append ( for/list ([letter letters]) ( string-append ( substring word 0 i ) ( string-append ( string letter ) ( substring word i ( string-length word ) ) ) ) ) acc ) )
+          ( for/list ([i ( range word-length )]) ( string-append ( substring word 0 i ) ( substring word ( + i 1 ) word-length ) ) )
+          ( for/list ([i ( range ( - word-length 1 ) )]) ( string-append ( substring word 0 i ) ( string-append ( string ( string-ref word ( + i 1 ) ) ( string-ref word i ) ) ( substring word ( + i 2 ) word-length ) ) ) )
+          ( for/fold ([acc '()]) ([i ( range word-length )] )
+             ( append ( for/list ([letter letters]) ( string-append ( substring word 0 i ) ( string-append ( string letter ) ( substring word ( + i 1 ) word-length ) ) ) ) acc ) )
+          ( for/fold ([acc '()]) ([i ( range ( + 1 word-length ) )] )
+             ( append ( for/list ([letter letters]) ( string-append ( substring word 0 i ) ( string-append ( string letter ) ( substring word i word-length ) ) ) ) acc ) )
           ) ) )
 
 ( define ( edits2 word )
-   ( foldl ( lambda ( new-word lst ) ( append lst ( edits1 new-word ) ) ) '() ( edits1 word ) ) )
+   ( foldl ( lambda ( new-word lst ) ( append ( edits1 new-word ) lst ) ) '() ( edits1 word ) ) )
 
 ( define ( correction word )
    ( select-max ( candidates word ) P ) )
@@ -69,13 +70,13 @@
 ( display "\n" )
 |#
 
-( define EDIT2-WORDS ( words ( file->string "edit2.txt" ) ) )
+( define EDIT2-WORDS ( words ( file->string "edits2.txt" ) ) )
 ( define WRONG-WORDS ( words ( file->string "wrong.txt" ) ) )
 
 ( define ( long-run words )
-   ( define start ( current-seconds ) )
+   ( define start ( current-inexact-milliseconds ) )
    ( for ([word words]) ( correction word ) )
-   ( / ( - ( current-seconds ) start ) ) 83 )
+   ( / ( - ( current-inexact-milliseconds ) start ) 83 ) )
 
 ( display "Runtime for 2 edits\n" )
 ( display ( long-run EDIT2-WORDS ) )
