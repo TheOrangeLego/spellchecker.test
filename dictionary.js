@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require( 'fs' );
 const path = require( 'path' );
 
@@ -5,16 +7,16 @@ const flatMap = (f,xs) =>
   xs.reduce((acc,x) =>
     acc.concat(f(x)), []);
 
-words = function( text ) {
-  content = text.toLowerCase().split( /\b/ );
+function words( text ) {
+  var content = text.toLowerCase().split( /\b/ );
   return content.filter( str => str != "" );
 };
 
-ALL_WORDS = words( fs.readFileSync( path.join( __dirname, 'big.txt' ), 'utf-8' ) );
-WORDS = {};
+var ALL_WORDS = words( fs.readFileSync( path.join( __dirname, 'big.txt' ), 'utf-8' ) );
+var WORDS = {};
 
-for ( index = 0; index < ALL_WORDS.length; index++ ) {
-  word = ALL_WORDS[index];
+for ( var index = 0; index < ALL_WORDS.length; index++ ) {
+  var word = ALL_WORDS[index];
 
   if ( word in WORDS )
     WORDS[word] += 1;
@@ -22,18 +24,18 @@ for ( index = 0; index < ALL_WORDS.length; index++ ) {
     WORDS[word] = 1;
 }
 
-N = ALL_WORDS.length;
+var N = ALL_WORDS.length;
 
-P = function( word ) {
+function P( word ) {
   if ( word in WORDS )
     return WORDS[word] / N;
   else
     return 0;
 };
 
-selectMax = function( list, key ) {
-  maxElm = "";
-  maxVal = 0;
+function selectMax( list, key ) {
+  var maxElm = "";
+  var maxVal = 0;
 
   list.forEach( word => {
     if ( key(word) >= maxVal ) {
@@ -45,10 +47,10 @@ selectMax = function( list, key ) {
   return maxElm;
 };
 
-candidates = function( word ) {
-  e0 = known( [word] );
-  e1 = known( edits1( word ) );
-  e2 = known( edits2( word ) );
+function candidates( word ) {
+  var e0 = known( [word] );
+  var e1 = known( edits1( word ) );
+  var e2 = known( edits2( word ) );
   
   if ( e0.length > 0 )
     return e0;
@@ -60,38 +62,38 @@ candidates = function( word ) {
     return [word];
 };
 
-known = function( words ) {
+function known( words ) {
   return words.filter( str => str in WORDS );
 };
 
-edits1 = function( word ) {
-  letters = "abcdefghijklmnopqrstuvwxyz".split('');
-  splits     = [];
-  deletes    = [];
-  transposes = [];
-  replaces   = [];
-  inserts    = [];
+function edits1( word ) {
+  var letters = "abcdefghijklmnopqrstuvwxyz".split('');
+  var splits     = [];
+  var deletes    = [];
+  var transposes = [];
+  var replaces   = [];
+  var inserts    = [];
 
   for ( index = 0; index <= word.length; index++ )
     splits.push( {L:word.substring( 0, index ), R:word.substring( index, word.length )} )
 
-  splits = splits.filter( split => split.R.length > 0 );
+  var splits = splits.filter( split => split.R.length > 0 );
 
-  deletes = splits.map( split =>
+  var deletes = splits.map( split =>
     split.L + split.R.substring( 1, split.R.length ) );
 
-  transposes = splits.filter( split => split.R.length > 1 ).map( split =>
+  var transposes = splits.filter( split => split.R.length > 1 ).map( split =>
     split.L + split.R[1] + split.R[0] + split.R.substring( 2, split.R.length ) );
 
-  getReplace = function( c ) {
+  function getReplace( c ) {
     return splits.map( split => split.L + c + split.R.substring( 1, split.R.length ) );
   };
 
-  replaces = letters.reduce( ( lst, char ) => 
+  var replaces = letters.reduce( ( lst, char ) => 
     lst.concat( getReplace( char ) ),
     [] );
 
-  getInsert = function( c ) {
+  function getInsert( c ) {
     return splits.map( split => split.L + c + split.R );
   }
 
@@ -102,29 +104,29 @@ edits1 = function( word ) {
   return deletes.concat( transposes ).concat( replaces ).concat( inserts );
 };
 
-edits2 = function( word ) {
+function edits2( word ) {
   return edits1( word ).reduce( ( lst, newWord ) => lst.concat( edits1( newWord ) ), [] );
 };
 
-correction = function( word ) {
+function correction( word ) {
   return selectMax( candidates( word ), P );
 };
 
 // CORRECT = fs.readFileSync( path.join( __dirname, 'correct.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
 // E1 = fs.readFileSync( path.join( __dirname, 'edit1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
-E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
-WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
-testTiming = function( words ) {
+function testTiming( words ) {
   console.log( "Single word" );
-  start = process.hrtime();
+  var start = process.hrtime();
   correction( words[0] );
   console.log( process.hrtime( start ) );
 
   console.log( "10 words" );
   // console.log( words.length );
-  start = process.hrtime();
-  for ( index = 0; index < 10; index = index + 1 ) {
+  var start = process.hrtime();
+  for ( var index = 0; index < 10; index = index + 1 ) {
     // console.log( index.toString() );
     // console.log( words[index] );
     // console.log( correction( words[index] ) );
@@ -134,8 +136,7 @@ testTiming = function( words ) {
 
   console.log( "100 words" );
   start = process.hrtime();
-  for ( index = 0; index < 100; index++ ) {
-    console.log( index );
+  for ( var index = 0; index < 100; index++ ) {
     correction( words[index] );
   }
   console.log( process.hrtime( start ) );
