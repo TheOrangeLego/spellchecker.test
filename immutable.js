@@ -94,7 +94,8 @@ function edits1( word ) {
 };
 
 function edits2( word ) {
-  return edits1( word ).reduce( ( lst, newWord ) => lst.concat( edits1( newWord ) ), List( [] ) );
+  return edits1( word ).map( newWord => edits1(newWord) ).flatten();
+  // return edits1( word ).reduce( ( lst, newWord ) => lst.concat( edits1( newWord ) ), List( [] ) );
 };
 
 function correction( word ) {
@@ -120,8 +121,12 @@ function testTiming( words ) {
 
   console.log( "100 words" );
   start = process.hrtime();
-  for ( var index = 0; index < 100; index++ )
+  for ( var index = 0; index < 100; index++ ) {
+    var anotherstart = process.hrtime();
+    console.log(words[index], correction(words[index]));
     correction( words[index] );
+    console.log("Single word timing:", process.hrtime(anotherstart));
+  }
   console.log( process.hrtime( start ) );
 };
 
@@ -133,9 +138,9 @@ console.log( "Edit 1 corrections" );
 testTiming( E1 );
 console.log( "\n" ); */
 
-console.log( "Edit 2 corrections" );
-testTiming( E2 );
-console.log( "\n" );
+//console.log( "Edit 2 corrections" );
+//testTiming( E2 );
+//console.log( "\n" );
 
 console.log( "Wrong corrections" );
 testTiming( WRONG );
