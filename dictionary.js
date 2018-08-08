@@ -15,7 +15,7 @@ function words( text ) {
 var ALL_WORDS = words( fs.readFileSync( path.join( __dirname, 'big.txt' ), 'utf-8' ) );
 var WORDS = {};
 
-for ( var index = 0; index < ALL_WORDS.length; index++ ) {
+for ( let index = 0; index < ALL_WORDS.length; index++ ) {
   var word = ALL_WORDS[index];
 
   if ( word in WORDS )
@@ -74,7 +74,7 @@ function edits1( word ) {
   var replaces   = [];
   var inserts    = [];
 
-  for ( index = 0; index <= word.length; index++ )
+  for ( let index = 0; index <= word.length; index++ )
     splits.push( {L:word.substring( 0, index ), R:word.substring( index, word.length )} )
 
   var splits = splits.filter( split => split.R.length > 0 );
@@ -126,7 +126,7 @@ function testTiming( words ) {
   console.log( "10 words" );
   // console.log( words.length );
   var start = process.hrtime();
-  for ( var index = 0; index < 10; index = index + 1 ) {
+  for ( let index = 0; index < 10; index = index + 1 ) {
     // console.log( index.toString() );
     // console.log( words[index] );
     // console.log( correction( words[index] ) );
@@ -136,7 +136,7 @@ function testTiming( words ) {
 
   console.log( "100 words" );
   start = process.hrtime();
-  for ( var index = 0; index < 100; index++ ) {
+  for ( let index = 0; index < 100; index++ ) {
     correction( words[index] );
   }
   console.log( process.hrtime( start ) );
@@ -150,10 +150,13 @@ console.log( "Edit 1 corrections" );
 testTiming( E1 );
 console.log( "\n" ); */
 
+/*
 console.log( "Edit 2 corrections" );
 testTiming( E2 );
 console.log( "\n" );
+*/
 
 console.log( "Wrong corrections" );
+console.log(edits2("informatzzn").length);
 testTiming( WRONG );
 console.log( "\n" );

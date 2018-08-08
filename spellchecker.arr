@@ -1,5 +1,5 @@
 import file as F
-import lists as L
+import list as L
 import string-dict as D
 import string as S
 import global as G
@@ -73,32 +73,57 @@ fun edits1( word ):
     end )
   replaces = L.reduce( word-indices,
     lam( list, index ):
-      L.concat( L.map( letters,
+      L.concat( list, L.map( letters,
         lam( letter ):
           S.concat( S.substring( word, 0, index ), S.concat( letter, S.substring( word, index + 1, S.length( word ) ) ) )
-        end ), list )
+        end ) )
     end,
     L.empty-list() )
   inserts = L.reduce( more-indices,
     lam( list, index ):
-      L.concat( L.map( letters,
+      L.concat( list, L.map( letters,
         lam( letter ):
           S.concat( S.substring( word, 0, index ), S.concat( letter, S.substring( word, index, S.length( word ) ) ) )
-        end ), list )
+        end ) )
     end,
     L.empty-list() )
-  L.concat( deletes, L.concat( transposes, L.concat( replaces, inserts ) ) )
+  L.concat( L.concat( L.concat( deletes, transposes), replaces), inserts )
 end
 
 fun edits2( word ):
   edits = edits1( word )
   L.reduce( edits,
     lam( all-edits, shadow word ):
-      L.concat( edits1( word ), all-edits )
+      L.concat( all-edits, edits1( word ) )
     end,
     L.empty-list() )
 end
 
-start = G.time-now()
-result = correction( "speling" )
-G.time-now( start )
+wrong = L.filter( L.filter( S.split-pattern( words( "wrong.txt" ), "\\b" ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+
+fun test-wrong-timing( words-list ) block:
+  G.print( "Single word\n" )
+  start = G.time-now()
+  edits2( L.at( words-list, 0 ) )
+  G.print( G.time-now( start ) )
+
+  G.print( "\n10 words\n" )
+  start2 = G.time-now()
+  L.map( L.slice( words-list, 0, 10 ), lam( word ): edits2( word ) end )
+  G.print( G.time-now( start2 ) )
+
+  G.print( "\n100 words\n" )
+  start3 = G.time-now()
+  L.map( words-list, lam( word ): edits2( word ) end )
+  G.print( G.time-now( start3 ) )
+end
+
+starting = G.time-now()
+result = correction( "informatzzn" )
+print(edits2("informatzzn").length)
+print(result)
+ending = G.time-now( starting )
+
+test-wrong-timing( wrong )
