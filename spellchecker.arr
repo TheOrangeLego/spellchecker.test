@@ -2,6 +2,7 @@ import file as F
 import lists as L
 import string-dict as D
 import string as S
+import global as G
 
 fun words( path ):
   S.string-to-lower( F.file-to-string( path ) )
@@ -98,10 +99,6 @@ fun edits2( word ):
     L.empty-list() )
 end
 
-correction( "speling" )
-
-#|
-x = [D.string-dict: { x : 15, y : 30 }]
-y = [L.list: "x", "y", "z"]
-D.is-dict( x )
-|#
+start = G.time-now()
+result = correction( "speling" )
+G.time-now( start )
