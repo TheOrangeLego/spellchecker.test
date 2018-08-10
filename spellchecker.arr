@@ -106,24 +106,27 @@ wrong = L.filter( L.filter( S.split-pattern( words( "wrong.txt" ), "\\b" ),
 fun test-wrong-timing( words-list ) block:
   G.print( "Single word\n" )
   start = G.time-now()
-  edits2( L.at( words-list, 0 ) )
-  G.print( G.time-now( start ) )
+  correction( L.at( words-list, 0 ) )
+  G.console-log( G.time-now( start ) )
 
   G.print( "\n10 words\n" )
   start2 = G.time-now()
-  L.map( L.slice( words-list, 0, 10 ), lam( word ): edits2( word ) end )
-  G.print( G.time-now( start2 ) )
+  L.map( L.slice( words-list, 0, 10 ), lam( word ): correction( word ) end )
+  G.console-log( G.time-now( start2 ) )
 
   G.print( "\n100 words\n" )
   start3 = G.time-now()
-  L.map( words-list, lam( word ): edits2( word ) end )
-  G.print( G.time-now( start3 ) )
+  L.map( words-list, lam( word ): correction( word ) end )
+  G.console-log( G.time-now( start3 ) )
 end
 
-starting = G.time-now()
-result = correction( "informatzzn" )
-print(edits2("informatzzn").length)
-print(result)
-ending = G.time-now( starting )
-
 test-wrong-timing( wrong )
+
+#|
+trials = L.range( 0, 10 )
+
+start = G.time-now()
+x = L.reduce( trials, lam( x ): x + L.length( edits2( "something" ) ) end, 0 )
+G.console-log( x )
+G.console-log( G.time-now( start ) )
+|#

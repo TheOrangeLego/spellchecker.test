@@ -5,6 +5,7 @@ var speller = {};
 speller.train = function (text) {
   content = text.toLowerCase().split( /\b/ );
   words = content.filter( str => str != "" );
+  console.log( words.length );
 
   for ( index = 0; index < words.length; index++ ) {
     word = words[index];
@@ -98,10 +99,10 @@ console.log( "Edit 1 corrections" );
 testTiming( E1 );
 console.log( "\n" ); */
 
-console.log( "Edit 2 corrections" );
+/* console.log( "Edit 2 corrections" );
 testTiming( E2 );
 console.log( "\n" );
 
 console.log( "Wrong corrections" );
 testTiming( WRONG );
-console.log( "\n" );
+console.log( "\n" ); */

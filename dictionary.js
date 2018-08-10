@@ -1,11 +1,8 @@
 "use strict";
 
+const assert = require( 'assert' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-const flatMap = (f,xs) =>
-  xs.reduce((acc,x) =>
-    acc.concat(f(x)), []);
 
 function words( text ) {
   var content = text.toLowerCase().split( /\b/ );
@@ -68,52 +65,155 @@ function known( words ) {
 
 function edits1( word ) {
   var letters = "abcdefghijklmnopqrstuvwxyz".split('');
+  var wordLength = word.length;
+
+  /* var wordIndices = [];
+  var lessIndices = [];
+  var moreIndices = [];
+
+  for ( var index = 0; index < word.length + 1; index++ ) {
+    if ( index < word.length ) {
+      if ( index < word.length - 1 ) {
+        lessIndices.push( index );
+      }
+
+      wordIndices.push( index );
+    }
+
+    moreIndices.push( index );
+  }
+
+  var deletes = wordIndices.map( index =>
+    word.substring( 0, index ) + word.substring( index + 1 ) );
+  
+  var transposes = lessIndices.map( index =>
+    word.substring( 0, index ) + word.charAt( index + 1 ) + word.charAt( index ) + word.substring( index + 2 ) );
+  
+  function getReplace( index ) {
+    return letters.map( letter =>
+      word.substring( 0, index ) + letter + word.substring( index + 1 ) );
+  };
+
+  var replaces = wordIndices.reduce( ( list, index ) =>
+  getReplace( index ).concat( list ), [] );
+
+  function getInsert( index ) {
+    return letters.map( letter =>
+      word.substring( 0, index ) + letter + word.substring( index ) );
+  };
+
+  var inserts = moreIndices.reduce( ( list, index ) =>
+  getInsert( index ).concat( list ), [] ); */
+
   var splits     = [];
   var deletes    = [];
   var transposes = [];
   var replaces   = [];
   var inserts    = [];
+  
+  for ( let index = 0; index <= wordLength; index++ )
+    splits.push( {L:word.substring( 0, index ), R:word.substring( index )} )
 
-  for ( let index = 0; index <= word.length; index++ )
-    splits.push( {L:word.substring( 0, index ), R:word.substring( index, word.length )} )
+  splits = splits.filter( split => split.R.length > 0 );
 
-  var splits = splits.filter( split => split.R.length > 0 );
-
-  var deletes = splits.map( split =>
+  deletes = splits.map( split =>
     split.L + split.R.substring( 1, split.R.length ) );
 
-  var transposes = splits.filter( split => split.R.length > 1 ).map( split =>
+  transposes = splits.filter( split => split.R.length > 1 ).map( split =>
     split.L + split.R[1] + split.R[0] + split.R.substring( 2, split.R.length ) );
 
   function getReplace( c ) {
     return splits.map( split => split.L + c + split.R.substring( 1, split.R.length ) );
   };
 
-  var replaces = letters.reduce( ( lst, char ) => 
-    lst.concat( getReplace( char ) ),
-    [] );
+  letters.map( char =>
+    {
+      var replacements = getReplace( char );
+      for ( var index = 0; index < replacements.length; index++ ) {
+        replaces.push( replacements[index] );
+      }
+    } );
 
   function getInsert( c ) {
     return splits.map( split => split.L + c + split.R );
   }
 
-  inserts = letters.reduce( ( lst, char ) => 
-    lst.concat( getInsert( char ) ),
-    [] );
+  letters.map( char =>
+    {
+      var insertions = getInsert( char );
+      for ( var index = 0; index < insertions.length; index++ ) {
+        inserts.push( insertions[index] );
+      }
+    } );
 
-  return deletes.concat( transposes ).concat( replaces ).concat( inserts );
+  /* using concat; slight slowdown */
+  /* replaces = letters.reduce( ( lst, char ) => 
+    lst.concat( getReplace( char ) ),
+    [] ); */
+
+  /* using concat; slight slowdown */
+  /* inserts = letters.reduce( ( lst, char ) => 
+    lst.concat( getInsert( char ) ),
+    [] ); */
+
+  /* old version of returning edits1; slight slowdown */
+  /* return deletes.concat( transposes ).concat( replaces ).concat( inserts ); */
+
+  /* using push to concatenate both lists; slightly faster */
+  var listA = myConcat( deletes, transposes );
+  var listB = myConcat( listA, replaces );
+
+  return myConcat( listB, inserts );
+};
+
+function myConcat( listA, listB ) {
+  var finalList = listA;
+
+  for ( var index = 0; index < listB.length; index++ ) {
+    finalList.push( listB[index] );
+  }
+
+  return finalList;
 };
 
 function edits2( word ) {
-  return edits1( word ).reduce( ( lst, newWord ) => lst.concat( edits1( newWord ) ), [] );
+  /* purely push */
+  var firstEdits = edits1( word );
+
+  var allEdits = [];
+
+  for ( var index = 0; index < firstEdits.length; index++ ) {
+    var innerEdits = edits1( firstEdits[index] );
+    for ( var editIndex = 0; editIndex < innerEdits.length; editIndex++ ) {
+      allEdits.push( innerEdits[editIndex] );
+    }
+  }
+
+  return allEdits;
+
+  /* checking if reduce was the cause of slowdown; it wasn't */
+  /* function updateEdits( allEdits, word ) {
+    var innerEdits = edits1( word );
+
+    for ( var index = 0; index < innerEdits.length; index++ ) {
+      allEdits.push( innerEdits[index] );
+    }
+
+    return allEdits;
+  };
+
+  var edits = edits1( word );
+  return edits.reduce( updateEdits, [] ); */
+
+  /* original version; really slow */
+  /* var edits = edits1( word );
+  return edits.reduce( ( list, editWord ) => list.concat( edits1( editWord ) ), [] ); */
 };
 
 function correction( word ) {
   return selectMax( candidates( word ), P );
 };
 
-// CORRECT = fs.readFileSync( path.join( __dirname, 'correct.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
-// E1 = fs.readFileSync( path.join( __dirname, 'edit1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
 var E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 var WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
@@ -121,16 +221,14 @@ function testTiming( words ) {
   console.log( "Single word" );
   var start = process.hrtime();
   correction( words[0] );
+  /* assert.deepEqual( correction( words[0] ), words[0] ); */
   console.log( process.hrtime( start ) );
 
   console.log( "10 words" );
-  // console.log( words.length );
   var start = process.hrtime();
   for ( let index = 0; index < 10; index = index + 1 ) {
-    // console.log( index.toString() );
-    // console.log( words[index] );
-    // console.log( correction( words[index] ) );
     correction( words[index] );
+    /* assert.deepEqual( correction( words[index] ), words[index] ); */
   }
   console.log( process.hrtime( start ) );
 
@@ -138,25 +236,17 @@ function testTiming( words ) {
   start = process.hrtime();
   for ( let index = 0; index < 100; index++ ) {
     correction( words[index] );
+    /* assert.deepEqual( correction( words[index] ), words[index] ); */
   }
   console.log( process.hrtime( start ) );
 };
 
-/* console.log( "Correct word corrections" );
-testTiming( CORRECT );
-console.log( "\n" );
-
-console.log( "Edit 1 corrections" );
-testTiming( E1 );
-console.log( "\n" ); */
-
-/*
-console.log( "Edit 2 corrections" );
-testTiming( E2 );
-console.log( "\n" );
-*/
-
 console.log( "Wrong corrections" );
-console.log(edits2("informatzzn").length);
 testTiming( WRONG );
 console.log( "\n" );
+
+/* var trials = [...Array( 10 ).keys()];
+var start = process.hrtime();
+var totalEdits = trials.reduce( x => x + ( edits2( "something" ) ).length, 0 );
+console.log( totalEdits );
+console.log( process.hrtime( start ) ); */
