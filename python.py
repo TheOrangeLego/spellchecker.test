@@ -40,30 +40,27 @@ def testTiming( words ):
     print "Single word"
     start = time.time()
     correction( words[0] )
-    # assert( correction( words[0] ) in WORDS ), ( "Word not in dictionary: " + words[0] )
     print time.time() - start
 
     print "10 words"
     start = time.time()
     for wordRange in range( 10 ):
         correction( words[wordRange] )
-        # assert( correction( words[wordRange] ) in WORDS ), ( "Word not in dictionary: " + words[wordRange] )
     print ( time.time() - start ) / 10
 
     print "100 words"
     start = time.time()
     for word in words:
         correction( word )
-        # assert( correction( word ) in WORDS ), ( "Word not in dictionary: " + word )
     print ( time.time() - start ) / 100
 
-""" E2 = re.findall( r'\w+', ( open( 'edits2.txt' ).read() ).lower() )
+""" E2 = re.findall( r'\w+', ( open( 'edits2.txt' ).read() ).lower() ) """
 WRONG = re.findall( r'\w+', ( open( 'wrong.txt' ).read() ).lower() )
 
-print "Edit 2 corrections"
+""" print "Edit 2 corrections"
 testTiming( E2 )
-print ""
+print "" """
 
 print "Wrong corrections"
 testTiming( WRONG )
-print "" """
+print ""

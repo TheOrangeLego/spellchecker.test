@@ -1,8 +1,0 @@
-#lang racket
-
-( require racket/file )
-
-( define ( words text )
-   ( display ( file->string text ) ) )
-
-( words "big.txt" )

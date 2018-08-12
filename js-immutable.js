@@ -102,8 +102,6 @@ function correction( word ) {
   return selectMax( candidates( word ), P );
 };
 
-// CORRECT = fs.readFileSync( path.join( __dirname, 'correct.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
-// E1 = fs.readFileSync( path.join( __dirname, 'edit1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
 var E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 var WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
@@ -122,21 +120,10 @@ function testTiming( words ) {
   console.log( "100 words" );
   start = process.hrtime();
   for ( var index = 0; index < 100; index++ ) {
-    var anotherstart = process.hrtime();
-    console.log(words[index], correction(words[index]));
     correction( words[index] );
-    console.log("Single word timing:", process.hrtime(anotherstart));
   }
   console.log( process.hrtime( start ) );
 };
-
-/* console.log( "Correct word corrections" );
-testTiming( CORRECT );
-console.log( "\n" );
-
-console.log( "Edit 1 corrections" );
-testTiming( E1 );
-console.log( "\n" ); */
 
 //console.log( "Edit 2 corrections" );
 //testTiming( E2 );

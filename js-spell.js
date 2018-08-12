@@ -5,7 +5,6 @@ var speller = {};
 speller.train = function (text) {
   content = text.toLowerCase().split( /\b/ );
   words = content.filter( str => str != "" );
-  console.log( words.length );
 
   for ( index = 0; index < words.length; index++ ) {
     word = words[index];
@@ -67,8 +66,6 @@ file = fs.readFileSync( path.join( __dirname, 'big.txt' ), 'utf-8' );
 
 speller.train( file );
 
-// CORRECT = fs.readFileSync( path.join( __dirname, 'correct.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
-// E1 = fs.readFileSync( path.join( __dirname, 'edit1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' );
 E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
@@ -91,18 +88,10 @@ testTiming = function( words ) {
   console.log( process.hrtime( start ) );
 };
 
-/* console.log( "Correct word corrections" );
-testTiming( CORRECT );
-console.log( "\n" );
-
-console.log( "Edit 1 corrections" );
-testTiming( E1 );
-console.log( "\n" ); */
-
 /* console.log( "Edit 2 corrections" );
 testTiming( E2 );
-console.log( "\n" );
+console.log( "\n" ); */
 
 console.log( "Wrong corrections" );
 testTiming( WRONG );
-console.log( "\n" ); */
+console.log( "\n" );
