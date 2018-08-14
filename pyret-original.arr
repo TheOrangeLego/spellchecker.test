@@ -91,10 +91,7 @@ fun edits2(word):
   end
 end
 
-# correct = words(F.input-file("correct.txt").read-file())
-# e1 = words2(F.input-file("edit1.txt").read-file())
-e2 = words2(F.input-file("edits2.txt").read-file())
-wrong = words2(F.input-file("wrong.txt").read-file())
+test-words = words2(F.input-file("wrong.txt").read-file())
 
 fun testTiming( words-list ) block:
   print( "Single word\n" )
@@ -113,20 +110,4 @@ fun testTiming( words-list ) block:
   print( time-now() - start3 )
 end
 
-#|
-print( "Correct word corrections\n" )
-testTiming( correct )
-print( "\n\n" )
-
-print( "Edit 1 corrections\n" )
-testTiming( e1 )
-print( "\n\n" )
-|#
-
-print( "Edit 2 corrections\n" )
-testTiming( e2 )
-print( "\n\n" )
-
-print( "Wrong corrections\n" )
-testTiming( wrong )
-print( "\n\n" )
+testTiming( test-words )

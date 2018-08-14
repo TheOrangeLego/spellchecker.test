@@ -26,7 +26,7 @@ egqqq
 accumulatqqq
 concqqq
 johnqqq
-marqqq
+marzqq
 cliqqq
 bridegrqqq
 moqqq
@@ -43,7 +43,7 @@ instqqq
 clusqqq
 liqqqq
 sinqqq
-sqqq
+sqqqq
 prolonqqq
 visqqq
 meqqq
@@ -91,7 +91,7 @@ solicitatiqqq
 aqqq
 applaudqqq
 flqqq
-sqqq
+sqqqq
 operqqq
 dqqq
 heedlqqq

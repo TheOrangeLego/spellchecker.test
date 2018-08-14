@@ -16,7 +16,11 @@ N = L.length( all-words )
 vocab = D.count( all-words )
 
 fun P( word ):
-  D.get( vocab, word ) / N
+  if D.has-key( vocab, word ):
+    D.get( vocab, word ) / N
+  else:
+    0
+  end
 end
 
 fun correction( word ):
@@ -92,41 +96,43 @@ end
 
 fun edits2( word ):
   edits = edits1( word )
-  L.reduce( edits,
-    lam( all-edits, shadow word ):
-      L.concat( all-edits, edits1( word ) )
-    end,
-    L.empty-list() )
+  L.flatten( L.map( edits, lam( newWord ): edits1( newWord ) end ) )
 end
 
-wrong = L.filter( L.filter( L.to-list( S.split-pattern( words( "wrong.txt" ), "\\b" ) ),
+test-words-e1 = L.filter( L.filter( L.to-list( S.split-pattern( words( "edits1.txt" ), "\\b" ) ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+test-words-e2 = L.filter( L.filter( L.to-list( S.split-pattern( words( "edits2.txt" ), "\\b" ) ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+test-words-w  = L.filter( L.filter( L.to-list( S.split-pattern( words( "wrong.txt" ), "\\b" ) ),
   lam(str): str <> " " end ),
   lam(str): str <> "\n" end )
 
-fun test-wrong-timing( words-list ) block:
+fun test-timing( words-list, must-correct ) block:
   G.print( "Single word\n" )
-  start = G.time-now()
-  correction( L.at( words-list, 0 ) )
+  start = G.time-now() 
   G.console-log( G.time-now( start ) )
 
-  G.print( "\n10 words\n" )
+  G.print( "10 words\n" )
   start2 = G.time-now()
   L.map( L.slice( words-list, 0, 10 ), lam( word ): correction( word ) end )
   G.console-log( G.time-now( start2 ) )
 
-  G.print( "\n100 words\n" )
+  G.print( "100 words\n" )
   start3 = G.time-now()
-  L.map( words-list, lam( word ): correction( word ) end )
+  L.map( words-list, lam( word ) block:
+    corrected-word = correction( word )
+    G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
+    G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
+    nothing
+  end )
   G.console-log( G.time-now( start3 ) )
 end
 
-test-wrong-timing( wrong )
-
-#|
-trials = L.range( 0, 10 )
-
-start = G.time-now()
-x = L.reduce( trials, lam( x ): x + L.length( edits2( "something" ) ) end, 0 )
-G.console-log( x )
-G.console-log( G.time-now( start ) )
-|#
+G.print( "\nEdits1  " )
+test-timing( test-words-e1, true )
+G.print( "\nEdits2  " )
+test-timing( test-words-e2, true )
+G.print( "\nWrong  " )
+test-timing( test-words-w, false )

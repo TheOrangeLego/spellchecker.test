@@ -28,7 +28,6 @@
 
     var count = function( list ) {
       var dict = Map();
-      list = List( list );
 
       for ( var index = 0; index < list.size; index++ ) {
         var elm = list.get( index );
@@ -47,9 +46,9 @@
       var dict = Map();
 
       for ( var index = 0; index < list.size; index++ ) {
-        var elm = list[index];
+        var elm = list.get( index );
 
-        dict = dict.set( elm, fun( elm ) );
+        dict = dict.set( elm, fun.app( elm ) );
       }
 
       return dict;
@@ -57,7 +56,7 @@
 
     var insert = function( dict, key, value ) { return dict.set( key, valye ); }
     var size = function( dict ) { return dict.size; }
-    var get = function( dict, elm ) { return dict[elm]; }
+    var get = function( dict, elm ) { return dict.get( elm ); }
     var hasKey = function( dict, elm ) { return dict.has( elm ); }
     var keys = function( dict ) { return List( dict ).map( lst => lst[0] ); }
     var values = function( dict ) { return dict.toList(); }

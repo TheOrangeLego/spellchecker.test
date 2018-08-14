@@ -4,7 +4,7 @@
 ( require racket/dict )
 
 ( define ( words text )
-   ( string-split ( string-downcase text ) ) )
+   ( regexp-split #rx"\\b" ( string-downcase text ) ) )
 
 ( define ALL-WORDS ( words ( file->string "big.txt" ) ) )
 
@@ -54,34 +54,46 @@
 ( define ( correction word )
    ( select-max ( candidates word ) P ) )
 
-( define ( make-runs word )
+( define TEST_WORDS_E1 ( words ( file->string "edits1.txt" ) ) )
+( define TEST_WORDS_E2 ( words ( file->string "edits2.txt" ) ) )
+( define TEST_WORDS_W  ( words ( file->string "wrong.txt" ) ) )
+
+( define ( short-run words )
    ( define start ( current-inexact-milliseconds ) )
-   ( for ([i ( range 10 )]) ( correction word ) )
+   ( correction ( list-ref words 0 ) )
    ( - ( current-inexact-milliseconds ) start ) )
 
-#|
-( display ( / ( make-runs "spelling" ) 10 ) )
-( display "\n" )
-
-( display ( / ( make-runs "spellung" ) 10 ) )
-( display "\n" )
-
-( display ( / ( make-runs "spellunz" ) 10 ) )
-( display "\n" )
-|#
-
-( define EDIT2-WORDS ( words ( file->string "edits2.txt" ) ) )
-( define WRONG-WORDS ( words ( file->string "wrong.txt" ) ) )
-
-( define ( long-run words )
+( define ( medium-run words )
    ( define start ( current-inexact-milliseconds ) )
-   ( for ([word words]) ( correction word ) )
-   ( / ( - ( current-inexact-milliseconds ) start ) 83 ) )
+   ( for ([index ( range 10 )]) ( correction ( list-ref words index ) ) )
+   ( - ( current-inexact-milliseconds ) start ) )
 
-( display "Runtime for 2 edits\n" )
-( display ( long-run EDIT2-WORDS ) )
-( display "\n" )
+( define ( long-run words must-correct )
+   ( define start ( current-inexact-milliseconds ) )
+   ( for ([index ( range 100 )])
+     ( let* ([word ( list-ref words index )]
+             [corrected-word ( correction word )]
+             [matching-word ( string=? corrected-word word )]
+             [word-in-words ( hash-has-key? WORDS corrected-word )] )
+       ( cond 
+         [( equal? matching-word  must-correct ) ( display ( string-append "Matching of word and corrected word " word "::" corrected-word "\n" ) )]
+         [( not ( equal? word-in-words must-correct ) ) ( display ( string-append "Checking word in vocabulary " corrected-word "\n" ) )] ) ) )
+   ( - ( current-inexact-milliseconds ) start ) )
 
-( display "Runtime for wrong words\n" )
-( display ( long-run WRONG-WORDS ) )
-( display "\n" )
+( define ( test-timing words must-correct )
+  ( display "\n" )
+  ( display ( short-run  words ) )
+  ( display "\n" )
+  ( display ( medium-run words ) )
+  ( display "\n" )
+  ( display ( long-run   words must-correct ) )
+  ( display "\n" ) )
+
+( display "Edits1" )
+( test-timing TEST_WORDS_E1 #t )
+
+( display "Edits2" )
+( test-timing TEST_WORDS_E2 #t )
+
+( display "Wrong" )
+( test-timing TEST_WORDS_W  #f )

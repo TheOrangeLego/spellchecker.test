@@ -36,7 +36,7 @@ def edits2(word):
     "All edits that are two edits away from `word`."
     return (e2 for e1 in edits1(word) for e2 in edits1(e1))
 
-def testTiming( words ):
+def testTiming( words, mustCorrect ):
     print "Single word"
     start = time.time()
     correction( words[0] )
@@ -46,21 +46,26 @@ def testTiming( words ):
     start = time.time()
     for wordRange in range( 10 ):
         correction( words[wordRange] )
-    print ( time.time() - start ) / 10
+    print ( time.time() - start )
 
     print "100 words"
     start = time.time()
     for word in words:
-        correction( word )
-    print ( time.time() - start ) / 100
+        corrected = correction( word )
+        assert ( corrected <> word ) == mustCorrect
+        assert ( corrected in WORDS ) == mustCorrect
+    print ( time.time() - start )
 
-""" E2 = re.findall( r'\w+', ( open( 'edits2.txt' ).read() ).lower() ) """
-WRONG = re.findall( r'\w+', ( open( 'wrong.txt' ).read() ).lower() )
+testWordsE1 = re.findall( r'\w+', ( open( 'edits1.txt' ).read() ).lower() )
+testWordsE2 = re.findall( r'\w+', ( open( 'edits2.txt' ).read() ).lower() )
+testWordsW  = re.findall( r'\w+', ( open( 'wrong.txt' ).read() ).lower() )
 
-""" print "Edit 2 corrections"
-testTiming( E2 )
-print "" """
+print "\nEdits1"
+testTiming( testWordsE1, True )
 
-print "Wrong corrections"
-testTiming( WRONG )
+print "\nEdits2"
+testTiming( testWordsE2, True )
+
+print "\nWrong"
+testTiming( testWordsW, False )
 print ""

@@ -1,5 +1,6 @@
-const fs = require( 'fs' )
-const path = require( 'path' )
+const fs     = require( 'fs' );
+const path   = require( 'path' );
+const assert = require( 'assert' );
 
 var speller = {};
 speller.train = function (text) {
@@ -66,32 +67,39 @@ file = fs.readFileSync( path.join( __dirname, 'big.txt' ), 'utf-8' );
 
 speller.train( file );
 
-E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
-WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var testWordsE1 = fs.readFileSync( path.join( __dirname, 'edits1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var testWordsE2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var testWordsW  = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
-testTiming = function( words ) {
+function testTiming( words, mustCorrect ) {
   console.log( "Single word" );
-  start = process.hrtime();
+  var start = process.hrtime();
   speller.correct( words[0] );
   console.log( process.hrtime( start ) );
 
   console.log( "10 words" );
-  start = process.hrtime();
-  for ( index = 0; index < 10; index++ )
+  var start = process.hrtime();
+  for ( let index = 0; index < 10; index = index + 1 ) {
     speller.correct( words[index] );
+  }
   console.log( process.hrtime( start ) );
 
   console.log( "100 words" );
-  start = process.hrtime();
-  for ( index = 0; index < 100; index++ )
-    speller.correct( words[index] );
+  var start = process.hrtime();
+  for ( let index = 0; index < 100; index++ ) {
+    var word = words[index];
+    var correctedWord = speller.correct( word );
+    assert.strictEqual( correctedWord !== word, mustCorrect );
+    assert.strictEqual( speller.nWords.hasOwnProperty( correctedWord ), mustCorrect );
+  }
   console.log( process.hrtime( start ) );
 };
 
-/* console.log( "Edit 2 corrections" );
-testTiming( E2 );
-console.log( "\n" ); */
+console.log( "\nEdits1" );
+testTiming( testWordsE1, true );
 
-console.log( "Wrong corrections" );
-testTiming( WRONG );
-console.log( "\n" );
+console.log( "\nEdits2 " );
+testTiming( testWordsE2, true );
+
+console.log( "\nWrong" );
+testTiming( testWordsW, false );

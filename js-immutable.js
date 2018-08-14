@@ -1,5 +1,6 @@
 "use strict";
 
+const assert        = require( 'assert' );
 const fs            = require( 'fs' );
 const path          = require( 'path' );
 const { Map, List } = require( 'immutable' );
@@ -102,33 +103,39 @@ function correction( word ) {
   return selectMax( candidates( word ), P );
 };
 
-var E2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
-var WRONG = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var testWordsE1 = fs.readFileSync( path.join( __dirname, 'edits1.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var testWordsE2 = fs.readFileSync( path.join( __dirname, 'edits2.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
+var testWordsW  = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' ).toLowerCase().split( /\b/ ).filter( str => str !== '\r\n' ).filter( str => str !== '\n' );
 
-function testTiming( words ) {
+function testTiming( words, mustCorrect ) {
   console.log( "Single word" );
   var start = process.hrtime();
   correction( words[0] );
   console.log( process.hrtime( start ) );
 
   console.log( "10 words" );
-  start = process.hrtime();
-  for ( var index = 0; index < 10; index++ )
+  var start = process.hrtime();
+  for ( let index = 0; index < 10; index = index + 1 ) {
     correction( words[index] );
+  }
   console.log( process.hrtime( start ) );
 
   console.log( "100 words" );
-  start = process.hrtime();
-  for ( var index = 0; index < 100; index++ ) {
-    correction( words[index] );
+  var start = process.hrtime();
+  for ( let index = 0; index < 100; index++ ) {
+    var word = words[index];
+    var correctedWord = correction( word );
+    assert.strictEqual( correctedWord !== word, mustCorrect );
+    assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
   }
   console.log( process.hrtime( start ) );
 };
 
-//console.log( "Edit 2 corrections" );
-//testTiming( E2 );
-//console.log( "\n" );
+console.log( "\nEdits1" );
+testTiming( testWordsE1, true );
 
-console.log( "Wrong corrections" );
-testTiming( WRONG );
-console.log( "\n" );
+console.log( "\nEdits2 " );
+testTiming( testWordsE2, true );
+
+console.log( "\nWrong" );
+testTiming( testWordsW, false );

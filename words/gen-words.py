@@ -17,7 +17,8 @@ def wrong(word):
 def generateWords():
   for i in range( 100 ):
     rWord = random.choice( WORDS )
+    print edits1( rWord )
     # print edits2( rWord )
-    print wrong( rWord )
+    # print wrong( rWord )
 
 generateWords()

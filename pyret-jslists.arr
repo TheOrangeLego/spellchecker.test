@@ -1,7 +1,7 @@
 import file as F
 import global as G
-import js-file("list-immutable-lib") as L
-import js-file("string-dict-immutable-lib") as D
+import js-file("list-lib") as L
+import js-file("string-dict-lib") as D
 import js-file("string-lib") as S
 
 fun words( path ) block:
@@ -100,7 +100,11 @@ end
 
 fun edits2( word ):
   edits = edits1( word )
-  L.flatten( L.map( edits, lam( newWord ): edits1( newWord ) end ) )
+  L.reduce( edits,
+    lam( all-edits, shadow word ):
+      L.concat( all-edits, edits1( word ) )
+    end,
+    L.empty-list() )
 end
 
 wrong = L.filter( L.filter( words( "wrong.txt" ),
