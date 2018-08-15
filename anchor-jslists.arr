@@ -128,8 +128,8 @@ fun test-timing( words-list, must-correct ) block:
   start3 = G.time-now()
   L.map( words-list, lam( word ) block:
     corrected-word = correction( word )
-    G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
-    G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
+    # G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
+    # G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
     nothing
   end )
   G.console-log( G.time-now( start3 ) )

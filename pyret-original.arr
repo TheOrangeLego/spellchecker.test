@@ -91,9 +91,11 @@ fun edits2(word):
   end
 end
 
-test-words = words2(F.input-file("wrong.txt").read-file())
+test-words-e1 = words2(F.input-file("edits1.txt").read-file())
+test-words-e2 = words2(F.input-file("edits2.txt").read-file())
+test-words-w  = words2(F.input-file("wrong.txt").read-file())
 
-fun testTiming( words-list ) block:
+fun test-timing( words-list, must-correct ) block:
   print( "Single word\n" )
   start = time-now()
   correction( words-list.get( 0 ) )
@@ -106,8 +108,18 @@ fun testTiming( words-list ) block:
 
   print( "\n100 words\n" )
   start3 = time-now()
-  each( lam( word ): correction( word ) end, words-list )
+  each( lam( word ) block:
+          corrected-word = correction( word )
+          # when ( ( corrected-word <> word ) <> must-correct ): print( "Word and correction comparison " + word + "::" + corrected-word + "\n" ) end
+          # when ( WORDS.has-key( corrected-word ) <> must-correct ): print( "Correction in vocabulary " + word + "::" + corrected-word + "\n" ) end
+          nothing
+        end, words-list )
   print( time-now() - start3 )
 end
 
-testTiming( test-words )
+print( "\nEdits1\n" )
+test-timing( test-words-e1, true )
+print( "\nEdits2\n" )
+test-timing( test-words-e2, true )
+print( "\nWrong\n" )
+test-timing( test-words-w, false )

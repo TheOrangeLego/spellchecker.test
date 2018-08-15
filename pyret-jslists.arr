@@ -62,7 +62,7 @@ fun known( shadow words ):
 end
 
 fun edits1( word ):
-  letters = L.to-list( S.split( "abcdefghijklmnopqrstuvwxyz", "" ) )
+  letters = S.split( "abcdefghijklmnopqrstuvwxyz", "" )
   word-length = string-length( word )
   word-indices = L.range( 0, word-length )
   less-indices = L.range( 0, word-length - 1 )
@@ -107,13 +107,19 @@ fun edits2( word ):
     L.empty-list() )
 end
 
-wrong = L.filter( L.filter( words( "wrong.txt" ),
+test-words-e1 = L.filter( L.filter( words( "edits1.txt" ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+test-words-e2 = L.filter( L.filter(words( "edits2.txt" ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+test-words-w  = L.filter( L.filter( words( "wrong.txt" ),
   lam(str): str <> " " end ),
   lam(str): str <> "\n" end )
 
-fun test-wrong-timing( words-list ) block:
+fun test-timing( words-list, must-correct ) block:
   print( "Single word\n" )
-  start = time-now()
+  start = time-now() 
   correction( L.at( words-list, 0 ) )
   print( time-now() - start )
 
@@ -124,8 +130,18 @@ fun test-wrong-timing( words-list ) block:
 
   print( "\n100 words\n" )
   start3 = time-now()
-  L.map( words-list, lam( word ): correction( word ) end )
+  L.map( words-list, lam( word ) block:
+    corrected-word = correction( word )
+    # when ( ( corrected-word <> word ) <> must-correct ): print( "Word and correction comparison " + word + "::" + corrected-word + "\n" ) end
+    # when ( D.has-key( vocab, corrected-word ) <> must-correct ): print( "Correction in vocabulary " + word + "::" + corrected-word + "\n" ) end
+    nothing
+  end )
   print( time-now() - start3 )
 end
 
-test-wrong-timing( wrong )
+print( "\nEdits1\n" )
+test-timing( test-words-e1, true )
+print( "\nEdits2\n" )
+test-timing( test-words-e2, true )
+print( "\nWrong\n" )
+test-timing( test-words-w, false )

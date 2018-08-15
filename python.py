@@ -51,9 +51,10 @@ def testTiming( words, mustCorrect ):
     print "100 words"
     start = time.time()
     for word in words:
-        corrected = correction( word )
-        assert ( corrected <> word ) == mustCorrect
-        assert ( corrected in WORDS ) == mustCorrect
+        correction( word )
+        # corrected = correction( word )
+        # assert ( corrected <> word ) == mustCorrect
+        # assert ( corrected in WORDS ) == mustCorrect
     print ( time.time() - start )
 
 testWordsE1 = re.findall( r'\w+', ( open( 'edits1.txt' ).read() ).lower() )

@@ -96,7 +96,6 @@ function edits1( word ) {
 
 function edits2( word ) {
   return edits1( word ).map( newWord => edits1(newWord) ).flatten();
-  // return edits1( word ).reduce( ( lst, newWord ) => lst.concat( edits1( newWord ) ), List( [] ) );
 };
 
 function correction( word ) {
@@ -125,8 +124,8 @@ function testTiming( words, mustCorrect ) {
   for ( let index = 0; index < 100; index++ ) {
     var word = words[index];
     var correctedWord = correction( word );
-    assert.strictEqual( correctedWord !== word, mustCorrect );
-    assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
+    // assert.strictEqual( correctedWord !== word, mustCorrect );
+    // assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
   }
   console.log( process.hrtime( start ) );
 };

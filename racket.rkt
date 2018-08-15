@@ -4,7 +4,7 @@
 ( require racket/dict )
 
 ( define ( words text )
-   ( regexp-split #rx"\\b" ( string-downcase text ) ) )
+   ( filter ( lambda( word ) ( not ( or ( string=? word "\n" ) ( string=? word " " ) ) ) ) ( regexp-split #px"\\b" ( string-downcase text ) ) ) )
 
 ( define ALL-WORDS ( words ( file->string "big.txt" ) ) )
 
@@ -54,9 +54,9 @@
 ( define ( correction word )
    ( select-max ( candidates word ) P ) )
 
-( define TEST_WORDS_E1 ( words ( file->string "edits1.txt" ) ) )
-( define TEST_WORDS_E2 ( words ( file->string "edits2.txt" ) ) )
-( define TEST_WORDS_W  ( words ( file->string "wrong.txt" ) ) )
+( define TEST_WORDS_E1 ( list-tail ( words ( file->string "edits1.txt" ) ) 1 ) )
+( define TEST_WORDS_E2 ( list-tail ( words ( file->string "edits2.txt" ) ) 1 ) )
+( define TEST_WORDS_W  ( list-tail ( words ( file->string "wrong.txt" ) ) 1 ) )
 
 ( define ( short-run words )
    ( define start ( current-inexact-milliseconds ) )
@@ -65,19 +65,19 @@
 
 ( define ( medium-run words )
    ( define start ( current-inexact-milliseconds ) )
-   ( for ([index ( range 10 )]) ( correction ( list-ref words index ) ) )
+   ( for ([word ( take words 10 )]) ( correction word ) )
    ( - ( current-inexact-milliseconds ) start ) )
 
 ( define ( long-run words must-correct )
    ( define start ( current-inexact-milliseconds ) )
-   ( for ([index ( range 100 )])
-     ( let* ([word ( list-ref words index )]
-             [corrected-word ( correction word )]
-             [matching-word ( string=? corrected-word word )]
-             [word-in-words ( hash-has-key? WORDS corrected-word )] )
-       ( cond 
-         [( equal? matching-word  must-correct ) ( display ( string-append "Matching of word and corrected word " word "::" corrected-word "\n" ) )]
-         [( not ( equal? word-in-words must-correct ) ) ( display ( string-append "Checking word in vocabulary " corrected-word "\n" ) )] ) ) )
+   ( for ([word words])
+      ( let* ([corrected-word ( correction word )]
+              [matches  ( string=? corrected-word word )]
+              [in-vocab ( hash-has-key? WORDS corrected-word )])
+         ( cond
+            #; [( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
+            #; [( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
+            [else 0]) ) )
    ( - ( current-inexact-milliseconds ) start ) )
 
 ( define ( test-timing words must-correct )

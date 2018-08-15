@@ -52,6 +52,11 @@
     }
     var emptyList = function() { return []; }
     var concat = function( listA, listB ) {
+      /* for ( var index = 0; index < listB.length; index++ ) {
+        listA.push( listB[index] );
+      }
+      
+      return listA; */
       return listA.concat( listB );
     }
     var isList = function( list ) { return list.constructor === 'array'; }

@@ -5,13 +5,10 @@ import js-file("string-dict-immutable-lib") as D
 import js-file("string-lib") as S
 
 fun words( path ) block:
-  split-words = S.split-pattern( S.string-to-lower( F.file-to-string( path ) ), "\\b" )
-
-  L.to-list( split-words )
+  S.split-pattern( S.string-to-lower( F.file-to-string( path ) ), "\\b" )
 end
 
-pre-words = words( "big.txt" )
-all-words = L.filter( L.filter( pre-words,
+all-words = L.filter( L.filter( L.to-list( words( "big.txt" ) ),
   lam(str): str <> " " end ),
   lam(str): str <> "\n" end )
 
@@ -103,13 +100,19 @@ fun edits2( word ):
   L.flatten( L.map( edits, lam( newWord ): edits1( newWord ) end ) )
 end
 
-wrong = L.filter( L.filter( words( "wrong.txt" ),
+test-words-e1 = L.filter( L.filter( L.to-list( words( "edits1.txt" ), "\\b" ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+test-words-e2 = L.filter( L.filter( L.to-list( words( "edits2.txt" ), "\\b" ),
+  lam(str): str <> " " end ),
+  lam(str): str <> "\n" end )
+test-words-w  = L.filter( L.filter( L.to-list( words( "wrong.txt" ), "\\b" ),
   lam(str): str <> " " end ),
   lam(str): str <> "\n" end )
 
-fun test-wrong-timing( words-list ) block:
+fun test-timing( words-list, must-correct ) block:
   print( "Single word\n" )
-  start = time-now()
+  start = time-now() 
   correction( L.at( words-list, 0 ) )
   print( time-now() - start )
 
@@ -120,8 +123,18 @@ fun test-wrong-timing( words-list ) block:
 
   print( "\n100 words\n" )
   start3 = time-now()
-  L.map( words-list, lam( word ): correction( word ) end )
+  L.map( words-list, lam( word ) block:
+    corrected-word = correction( word )
+    # when ( ( corrected-word <> word ) <> must-correct ): print( "Word and correction comparison " + word + "::" + corrected-word + "\n" ) end
+    # when ( D.has-key( vocab, corrected-word ) <> must-correct ): print( "Correction in vocabulary " + word + "::" + corrected-word + "\n" ) end
+    nothing
+  end )
   print( time-now() - start3 )
 end
 
-test-wrong-timing( wrong )
+print( "\nEdits1\n" )
+test-timing( test-words-e1, true )
+print( "\nEdits2\n" )
+test-timing( test-words-e2, true )
+print( "\nWrong\n" )
+test-timing( test-words-w, false )

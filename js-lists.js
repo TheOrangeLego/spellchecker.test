@@ -126,44 +126,44 @@ function edits1( word ) {
     return splits.map( split => split.L + c + split.R.substring( 1, split.R.length ) );
   };
 
-  letters.map( char =>
+  /* letters.map( char =>
     {
       var replacements = getReplace( char );
       for ( var index = 0; index < replacements.length; index++ ) {
         replaces.push( replacements[index] );
       }
-    } );
+    } ); */
 
   function getInsert( c ) {
     return splits.map( split => split.L + c + split.R );
   }
 
-  letters.map( char =>
+  /* letters.map( char =>
     {
       var insertions = getInsert( char );
       for ( var index = 0; index < insertions.length; index++ ) {
         inserts.push( insertions[index] );
       }
-    } );
+    } ); */
 
   /* using concat; slight slowdown */
-  /* replaces = letters.reduce( ( lst, char ) => 
+  replaces = letters.reduce( ( lst, char ) => 
     lst.concat( getReplace( char ) ),
-    [] ); */
+    [] );
 
   /* using concat; slight slowdown */
-  /* inserts = letters.reduce( ( lst, char ) => 
+  inserts = letters.reduce( ( lst, char ) => 
     lst.concat( getInsert( char ) ),
-    [] ); */
+    [] );
 
   /* old version of returning edits1; slight slowdown */
-  /* return deletes.concat( transposes ).concat( replaces ).concat( inserts ); */
+  return deletes.concat( transposes ).concat( replaces ).concat( inserts );
 
   /* using push to concatenate both lists; slightly faster */
-  var listA = myConcat( deletes, transposes );
+  /* var listA = myConcat( deletes, transposes );
   var listB = myConcat( listA, replaces );
 
-  return myConcat( listB, inserts );
+  return myConcat( listB, inserts ); */
 };
 
 function myConcat( listA, listB ) {
@@ -236,8 +236,8 @@ function testTiming( words, mustCorrect ) {
   for ( let index = 0; index < 100; index++ ) {
     var word = words[index];
     var correctedWord = correction( word );
-    assert.strictEqual( correctedWord !== word, mustCorrect );
-    assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
+    //assert.strictEqual( correctedWord !== word, mustCorrect );
+    //assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
   }
   console.log( process.hrtime( start ) );
 };
