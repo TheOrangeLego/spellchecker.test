@@ -116,7 +116,8 @@ test-words-w  = L.filter( L.filter( S.split-pattern( words( "wrong.txt" ), "\\b"
 
 fun test-timing( words-list, must-correct ) block:
   G.print( "Single word\n" )
-  start = G.time-now() 
+  start = G.time-now()
+  correction( L.at( words-list, 0 ) )
   G.console-log( G.time-now( start ) )
 
   G.print( "10 words\n" )

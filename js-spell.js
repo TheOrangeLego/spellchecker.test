@@ -74,13 +74,13 @@ var testWordsW  = fs.readFileSync( path.join( __dirname, 'wrong.txt' ), 'utf-8' 
 function testTiming( words, mustCorrect ) {
   console.log( "Single word" );
   var start = process.hrtime();
-  speller.correct( words[0] );
+  var correctedWord = speller.correct( words[0] );
   console.log( process.hrtime( start ) );
 
   console.log( "10 words" );
   var start = process.hrtime();
   for ( let index = 0; index < 10; index = index + 1 ) {
-    speller.correct( words[index] );
+    var correctedWord = speller.correct( words[index] );
   }
   console.log( process.hrtime( start ) );
 
