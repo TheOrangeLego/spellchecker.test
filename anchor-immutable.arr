@@ -60,37 +60,40 @@ end
 
 fun edits1( word ):
   letters = L.to-list( S.split( "abcdefghijklmnopqrstuvwxyz", "" ) )
-  word-indices = L.range( 0, S.length( word ) )
-  less-indices = L.range( 0, S.length( word ) - 1 )
-  more-indices = L.range( 0, S.length( word ) + 1 )
+  word-indices = L.range( 0, S.length( word ) + 1 )
 
-  # deletes
-  deletes = L.map( word-indices,
+  splits = L.map( word-indices,
     lam( index ):
-      S.concat( S.substring( word, 0, index ), S.substring( word, index + 1, S.length( word ) ) )
+      { L: S.substring( word, 0, index ), R: S.substring( word, index, S.length( word ) ) }
     end )
-  transposes = L.map( less-indices,
-    lam( index ):
-      S.concat( S.substring( word, 0, index ),
-                S.concat( S.charAt( word, index + 1 ),
-                          S.concat( S.charAt( word, index ), S.substring( word, index + 2, S.length( word ) ) ) ) )
+
+  deletes = L.map( L.filter( splits, lam( pair ): S.length( pair.R ) > 0 end ),
+    lam( pair ):
+      S.concat( pair.L, S.substring( pair.R, 1, S.length( pair.R ) ) )
     end )
-  replaces = L.reduce( word-indices,
-    lam( list, index ):
-      L.concat( list, L.map( letters,
-        lam( letter ):
-          S.concat( S.substring( word, 0, index ), S.concat( letter, S.substring( word, index + 1, S.length( word ) ) ) )
-        end ) )
-    end,
-    L.empty-list() )
-  inserts = L.reduce( more-indices,
-    lam( list, index ):
-      L.concat( list, L.map( letters,
-        lam( letter ):
-          S.concat( S.substring( word, 0, index ), S.concat( letter, S.substring( word, index, S.length( word ) ) ) )
-        end ) )
-    end,
-    L.empty-list() )
+
+  transposes = L.map( L.filter( splits, lam( pair ): S.length( pair.R ) > 1 end ),
+    lam( pair ):
+      S.concat( pair.L, S.concat( S.charAt( pair.R, 1 ), S.concat( S.charAt( pair.R, 0 ), S.substring( pair.R, 2, S.length( pair.R ) ) ) ) )
+    end )
+  
+  fun getReplace( char ):
+    L.map( L.filter( splits, lam( pair ): S.length( pair.R ) > 0 end ),
+      lam( pair ):
+        S.concat( pair.L, S.concat( char, S.substring( pair.R, 1, S.length( pair.R ) ) ) )
+      end )
+  end
+
+  fun getInsert( char ):
+    L.map( splits,
+      lam( pair ):
+        S.concat( pair.L, S.concat( char, pair.R ) )
+      end )
+  end
+
+  replaces = L.flat-map( letters, getReplace )
+  inserts = L.flat-map( letters, getInsert )
+  
   L.concat( L.concat( L.concat( deletes, transposes), replaces), inserts )
 end
 
@@ -124,8 +127,8 @@ fun test-timing( words-list, must-correct ) block:
   start3 = G.time-now()
   L.map( words-list, lam( word ) block:
     corrected-word = correction( word )
-    # G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
-    # G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
+    G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
+    G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
     nothing
   end )
   G.console-log( G.time-now( start3 ) )

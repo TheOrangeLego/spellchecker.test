@@ -70,25 +70,23 @@ function edits1( word ) {
   var splits  = List( [] )
   
   for ( var index = 0; index <= word.length; index++ )
-    if ( word.length - index > 0 )
-      splits = splits.push( {L:word.substring( 0, index ), R:word.substring( index, word.length )} )
+    splits = splits.push( {L:word.substring( 0, index ), R:word.substring( index, word.length )} )
 
-  var deletes = splits.map( split =>
+  var deletes = splits.filter( split => split.R.length > 0 ).map( split =>
     split.L + split.R.substring( 1, split.R.length ) );
 
   var transposes = splits.filter( split => split.R.length > 1 ).map( split =>
     split.L + split.R[1] + split.R[0] + split.R.substring( 2, split.R.length ) );
 
   function getReplace( c ) {
-    return splits.map( split => split.L + c + split.R.substring( 1, split.R.length ) );
+    return splits.filter( split => split.R.length > 0 ).map( split => split.L + c + split.R.substring( 1, split.R.length ) );
   };
-
-  var replaces = letters.flatMap( getReplace );
 
   function getInsert( c ) {
     return splits.map( split => split.L + c + split.R );
   }
 
+  var replaces = letters.flatMap( getReplace );
   var inserts = letters.flatMap( getInsert );
 
   return deletes.concat( transposes ).concat( replaces ).concat( inserts );
@@ -124,8 +122,8 @@ function testTiming( words, mustCorrect ) {
   for ( let index = 0; index < 100; index++ ) {
     var word = words[index];
     var correctedWord = correction( word );
-    // assert.strictEqual( correctedWord !== word, mustCorrect );
-    // assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
+    //assert.strictEqual( correctedWord !== word, mustCorrect );
+    //assert.strictEqual( WORDS.hasOwnProperty( correctedWord ), mustCorrect );
   }
   console.log( process.hrtime( start ) );
 };

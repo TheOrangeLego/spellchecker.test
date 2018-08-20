@@ -37,16 +37,14 @@
    ( filter ( lambda ( word ) ( hash-has-key? WORDS word ) ) words ) )
 
 ( define ( edits1 word )
-   ( let ([letters "abcdefghijklmnopqrstuvwxyz"]
-          [word-length ( string-length word )])
+   ( let* ([letters "abcdefghijklmnopqrstuvwxyz"]
+           [word-length ( string-length word )]
+           [splits ( for/list ([index ( range ( + 1 word-length ) )]) ( cons ( substring word 0 index ) ( substring word index word-length ) ) )] )
       ( append
-          ( for/list ([i ( range word-length )]) ( string-append ( substring word 0 i ) ( substring word ( + i 1 ) word-length ) ) )
-          ( for/list ([i ( range ( - word-length 1 ) )]) ( string-append ( substring word 0 i ) ( string-append ( string ( string-ref word ( + i 1 ) ) ( string-ref word i ) ) ( substring word ( + i 2 ) word-length ) ) ) )
-          ( for/fold ([acc '()]) ([i ( range word-length )] )
-             ( append ( for/list ([letter letters]) ( string-append ( substring word 0 i ) ( string-append ( string letter ) ( substring word ( + i 1 ) word-length ) ) ) ) acc ) )
-          ( for/fold ([acc '()]) ([i ( range ( + 1 word-length ) )] )
-             ( append ( for/list ([letter letters]) ( string-append ( substring word 0 i ) ( string-append ( string letter ) ( substring word i word-length ) ) ) ) acc ) )
-          ) ) )
+          ( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( string-append ( car pair ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) )
+          ( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 1 ) ) splits )]) ( string-append ( car pair ) ( string ( string-ref ( cdr pair ) 1 ) ) ( string ( string-ref ( cdr pair ) 0 ) ) ( substring ( cdr pair ) 2 ( string-length ( cdr pair ) ) ) ) )
+          ( for/fold ([acc '()]) ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) ) acc ) )
+          ( for/fold ([acc '()]) ([pair splits]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( cdr pair ) ) ) acc ) ) ) ) )
 
 ( define ( edits2 word )
    ( foldl ( lambda ( new-word lst ) ( append ( edits1 new-word ) lst ) ) '() ( edits1 word ) ) )
@@ -75,8 +73,8 @@
               [matches  ( string=? corrected-word word )]
               [in-vocab ( hash-has-key? WORDS corrected-word )])
          ( cond
-            #; [( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
-            #; [( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
+            [( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
+            [( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
             [else 0]) ) )
    ( - ( current-inexact-milliseconds ) start ) )
 

@@ -14,7 +14,13 @@ There are 10 total implementations:
 * `anchor-lists.arr` - an experimental CLI implementation of Pyret that uses builtin JS arrays and objects for its lists and dictionaries, respectively
 * `anchor-immutable.arr` - similar to `anchor-lists.arr`, but the underlying structure of lists and dictionaries uses Facebook's immutable collection
 
-All versions follow the same structure and procedure as discussed by Norvig. Each implementation was tasked with spell checking 3 different types of words: words that were 1 edit away from a correct word found in the corpus (`big.txt`), words that were 2 edits away, and words that were 3 or more edits away. Each spell checker was timed for the total time it took to correct 1, 10, and 100 words of each type. In order to assure that they were running correctly, when correcting 100 words an assertion was made that if the word was 1 or 2 edits away, the word returned by the corrector was not the same as the initial given word and that it was found in the corpus, and vice versa if the word was 3 or more edits away.
+Below is a graph representing the underlying data structure used for each implementation
+
+
+# 
+All versions follow the same structure and procedure as discussed by Norvig. Each implementation was tasked with spell checking 3 different types of words: words that were 1 edit away from a correct word found in the corpus (`big.txt`), words that were 2 edits away, and words that were 3 or more edits away. Each spell checker was timed for the total time it took to correct 1, 10, and 100 words of each type. In order to assure that they were running correctly, an assertion was made when correcting 100 words such that if the word was 1 or 2 edits away, the word returned by the corrector was not the same as the initial given word and that it was found in the corpus, and vice versa if the word was 3 or more edits away.
+
+
 
 # Data
 https://docs.google.com/spreadsheets/d/1hDniIEtKY8GPeuk0Al-XyGTundKR4BD-rSUGG63uV6c/edit?usp=sharing

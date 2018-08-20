@@ -110,7 +110,7 @@ fun test-timing( words-list, must-correct ) block:
   start3 = time-now()
   each( lam( word ) block:
           corrected-word = correction( word )
-          #when ( ( corrected-word <> word ) <> must-correct ): print( "Word and correction comparison " + word + "::" + corrected-word + "\n" ) end
+          # when ( ( corrected-word <> word ) <> must-correct ): print( "Word and correction comparison " + word + "::" + corrected-word + "\n" ) end
           # when ( WORDS.has-key( corrected-word ) <> must-correct ): print( "Correction in vocabulary " + word + "::" + corrected-word + "\n" ) end
           nothing
         end, words-list )

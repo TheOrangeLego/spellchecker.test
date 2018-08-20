@@ -89,8 +89,8 @@ function testTiming( words, mustCorrect ) {
   for ( let index = 0; index < 100; index++ ) {
     var word = words[index];
     var correctedWord = speller.correct( word );
-    // assert.strictEqual( correctedWord !== word, mustCorrect );
-    // assert.strictEqual( speller.nWords.hasOwnProperty( correctedWord ), mustCorrect );
+    assert.strictEqual( correctedWord !== word, mustCorrect );
+    assert.strictEqual( speller.nWords.hasOwnProperty( correctedWord ), mustCorrect );
   }
   console.log( process.hrtime( start ) );
 };

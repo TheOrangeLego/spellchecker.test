@@ -93,22 +93,22 @@ fun edits1( word ):
 
   replaces = L.reduce( letters,
     lam( lst, char ):
-      L.concat-push( lst, getReplace( char ) )
+      L.concat( lst, getReplace( char ) )
     end, L.empty-list() )
 
   inserts = L.reduce( letters,
     lam( lst, char ):
-      L.concat-push( lst, getInsert( char ) )
+      L.concat( lst, getInsert( char ) )
     end, L.empty-list() )
-
-  L.concat-push( L.concat-push( L.concat-push( deletes, transposes), replaces), inserts )
+  
+  L.concat( L.concat( L.concat( deletes, transposes), replaces), inserts )
 end
 
 fun edits2( word ):
   edits = edits1( word )
   L.reduce( edits,
     lam( all-edits, shadow word ):
-      L.concat-push( all-edits, edits1( word ) )
+      L.concat( all-edits, edits1( word ) )
     end,
     L.empty-list() )
 end
