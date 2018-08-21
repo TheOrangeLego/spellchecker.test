@@ -30,11 +30,14 @@ pyret pyret-jslists.arr
 echo "Running timings for pyret-concat"
 pyret pyret-concat.arr
 
-# echo "Running timings for pyret-original"
-# pyret pyret-original.arr
+echo "Running timings for pyret-original"
+pyret pyret-original.arr
 
 echo "Running timings for python"
 python python.py
+
+echo "Running timings for python-concat"
+python python-concat.py
 
 echo "Running timings for racket"
 racket racket.rkt

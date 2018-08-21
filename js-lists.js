@@ -64,64 +64,6 @@ function known( words ) {
 };
 
 function edits1( word ) {
-  /* this is interesting -- using indices takes much longer, possibly since it requires access time for calculating the edits */
-  /* var letters = "abcdefghijklmnopqrstuvwxyz".split('');
-
-  var wordIndices = [];
-  var lessIndices = [];
-  var moreIndices = [];
-
-  for ( var index = 0; index < word.length; index++ ) {
-    wordIndices.push( index );
-    moreIndices.push( index );
-  }
-
-  lessIndices = wordIndices.slice( 0, wordIndices.length - 1 );
-  moreIndices.push( word.length );
-
-  var deletes = wordIndices.map( index =>
-    word.substring( 0, index ) + word.substring( index + 1 ) );
-  
-  var transposes = lessIndices.map( index =>
-    word.substring( 0, index ) + word.charAt( index + 1 ) + word.charAt( index ) + word.substring( index + 2 ) );
-  
-  function getReplace( index ) {
-    return letters.map( letter =>
-      word.substring( 0, index ) + letter + word.substring( index + 1 ) );
-  };
-
-  var replaces = wordIndices.reduce( ( list, index ) =>
-  myConcat( list, getReplace( index ) ), [] );
-
-  function getInsert( index ) {
-    return letters.map( letter =>
-      word.substring( 0, index ) + letter + word.substring( index ) );
-  };
-
-  var inserts = moreIndices.reduce( ( list, index ) =>
-  myConcat( list, getInsert( index ) ), [] );
-
-  letters.map( char =>
-    {
-      var replacements = getReplace( char );
-      for ( var index = 0; index < replacements.length; index++ ) {
-        replaces.push( replacements[index] );
-      }
-    } );
-
-  letters.map( char =>
-    {
-      var insertions = getInsert( char );
-      for ( var index = 0; index < insertions.length; index++ ) {
-        inserts.push( insertions[index] );
-      }
-    } );
-
-  var listA = myConcat( deletes, transposes );
-  var listB = myConcat( listA, replaces );
-
-  return myConcat( listB, inserts ); */
-
   var letters = "abcdefghijklmnopqrstuvwxyz".split('');
   var wordLength = word.length;
 
@@ -163,7 +105,9 @@ function edits1( word ) {
 };
 
 function myConcat( listA, listB ) {
-  Array.prototype.push.apply( listA, listB );
+  for ( var index = 0; index < listB.length; index++ ) {
+    listA.push( listB[index] );
+  }
 
   return listA;
 };
@@ -176,7 +120,9 @@ function edits2( word ) {
 
   for ( var index = 0; index < firstEdits.length; index++ ) {
     var innerEdits = edits1( firstEdits[index] );
-    Array.prototype.push.apply( allEdits, innerEdits );
+    for ( var innerIndex = 0; innerIndex < innerEdits.length; innerIndex++ ) {
+      allEdits.push( innerEdits[innerIndex] );
+    }
   }
 
   return allEdits;
