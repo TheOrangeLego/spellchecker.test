@@ -73,8 +73,8 @@
               [matches  ( string=? corrected-word word )]
               [in-vocab ( hash-has-key? WORDS corrected-word )])
          ( cond
-            [( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
-            [( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
+            #; [( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
+            #; [( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
             [else 0]) ) )
    ( - ( current-inexact-milliseconds ) start ) )
 

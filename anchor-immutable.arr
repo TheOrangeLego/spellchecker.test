@@ -99,7 +99,7 @@ end
 
 fun edits2( word ):
   edits = edits1( word )
-  L.flatten( L.map( edits, lam( newWord ): edits1( newWord ) end ) )
+  L.flat-map( edits, lam( newWord ): edits1( newWord ) end )
 end
 
 test-words-e1 = L.filter( L.filter( L.to-list( S.split-pattern( words( "edits1.txt" ), "\\b" ) ),
@@ -127,8 +127,8 @@ fun test-timing( words-list, must-correct ) block:
   start3 = G.time-now()
   L.map( words-list, lam( word ) block:
     corrected-word = correction( word )
-    G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
-    G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
+    # G.assert( corrected-word <> word, must-correct, "Word and correction comparison " + word + "::" + corrected-word )
+    # G.assert( D.has-key( vocab, corrected-word ), must-correct, "Correction in vocabulary " + word + "::" + corrected-word )
     nothing
   end )
   G.console-log( G.time-now( start3 ) )
