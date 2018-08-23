@@ -33,10 +33,11 @@ def edits1(word):
     return deletes + transposes + replaces + inserts
 
 def edits2(word): 
-    lst = []
-    for e1 in edits1(word):
-      lst = lst + edits1(e1)
-    return lst
+    # lst = []
+    # for e1 in edits1(word):
+    #  lst = lst + edits1(e1)
+    # return lst
+    return reduce( lambda a, b: a + edits1( b ), edits1( word ), [] )
 
 def testTiming( words, mustCorrect ):
     print "Single word"

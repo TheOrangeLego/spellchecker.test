@@ -41,13 +41,24 @@
            [word-length ( string-length word )]
            [splits ( for/list ([index ( range ( + 1 word-length ) )]) ( cons ( substring word 0 index ) ( substring word index word-length ) ) )] )
       ( append
-          ( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( string-append ( car pair ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) )
-          ( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 1 ) ) splits )]) ( string-append ( car pair ) ( string ( string-ref ( cdr pair ) 1 ) ) ( string ( string-ref ( cdr pair ) 0 ) ) ( substring ( cdr pair ) 2 ( string-length ( cdr pair ) ) ) ) )
-          ( for/fold ([acc '()]) ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) ) acc ) )
-          ( for/fold ([acc '()]) ([pair splits]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( cdr pair ) ) ) acc ) ) ) ) )
+          ;comprehensions
+          ;( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( string-append ( car pair ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) )
+          ;( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 1 ) ) splits )]) ( string-append ( car pair ) ( string ( string-ref ( cdr pair ) 1 ) ) ( string ( string-ref ( cdr pair ) 0 ) ) ( substring ( cdr pair ) 2 ( string-length ( cdr pair ) ) ) ) )
+          ;( for/fold ([acc '()]) ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) ) acc ) )
+          ;( for/fold ([acc '()]) ([pair splits]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( cdr pair ) ) ) acc ) ) ) ) )
+          
+          ;folding
+          ( foldl ( lambda ( pair lst ) ( append ( list ( string-append ( car pair ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) ) lst ) ) '() ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits ) )
+          ( foldl ( lambda ( pair lst ) ( append ( list ( string-append ( car pair ) ( string ( string-ref ( cdr pair ) 1 ) ) ( string ( string-ref ( cdr pair ) 0 ) ) ( substring ( cdr pair ) 2 ( string-length ( cdr pair ) ) ) ) ) lst ) ) '() ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 1 ) ) splits ) )
+          ( foldl ( lambda ( char lst ) ( append ( foldl ( lambda ( pair inner-list ) ( append ( list ( string-append ( car pair ) ( string char ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) ) inner-list ) ) '() ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits ) ) lst ) ) '()  ( string->list letters ) )
+          ( foldl ( lambda ( char lst ) ( append ( foldl ( lambda ( pair inner-list ) ( append ( list ( string-append ( car pair ) ( string char ) ( cdr pair ) ) ) inner-list ) ) '() splits ) lst ) ) '() ( string->list letters ) ) ) ) )
 
 ( define ( edits2 word )
-   ( foldl ( lambda ( new-word lst ) ( append ( edits1 new-word ) lst ) ) '() ( edits1 word ) ) )
+   ; comprehensions
+   ;( for/fold ([acc '()]) ([new-word ( edits1 word )]) ( append ( edits1 new-word ) acc ) ) )
+
+   ;folding
+   ( foldl ( lambda ( new-word lst ) ( append lst ( edits1 new-word ) ) ) '() ( edits1 word ) ) )
 
 ( define ( correction word )
    ( select-max ( candidates word ) P ) )
@@ -73,8 +84,8 @@
               [matches  ( string=? corrected-word word )]
               [in-vocab ( hash-has-key? WORDS corrected-word )])
          ( cond
-            #; [( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
-            #; [( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
+            ;[( equal? matches must-correct ) ( display ( string-append "Words matching " corrected-word "::" word "\n" ) )]
+            ;[( not ( equal? in-vocab must-correct ) ) ( display ( string-append "Word in dictionary " corrected-word "::" word "\n" ) )]
             [else 0]) ) )
    ( - ( current-inexact-milliseconds ) start ) )
 

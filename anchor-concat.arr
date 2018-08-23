@@ -1,6 +1,6 @@
 import file as F
-import list as L
-import string-dict as D
+import js-file( "anchor-library/list" ) as L
+import js-file( "anchor-library/string-dict" ) as D
 import string as S
 import global as G
 

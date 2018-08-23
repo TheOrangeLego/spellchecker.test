@@ -93,7 +93,7 @@ function edits1( word ) {
 };
 
 function edits2( word ) {
-  return edits1( word ).flatMap( newWord => edits1(newWord) );
+  return edits1( word ).map( newWord => edits1(newWord) ).flatten();
 };
 
 function correction( word ) {

@@ -1,6 +1,6 @@
 import file as F
-import lists-immutable as L
-import string-dict-immutable as D
+import js-file( "anchor-library/list-immutable" ) as L
+import js-file( "anchor-library/string-dict-immutable" ) as D
 import string as S
 import global as G
 
@@ -99,7 +99,7 @@ end
 
 fun edits2( word ):
   edits = edits1( word )
-  L.flat-map( edits, lam( newWord ): edits1( newWord ) end )
+  L.flatten( L.map( edits, lam( newWord ): edits1( newWord ) end ) )
 end
 
 test-words-e1 = L.filter( L.filter( L.to-list( S.split-pattern( words( "edits1.txt" ), "\\b" ) ),
