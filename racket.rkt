@@ -44,6 +44,8 @@
           ;comprehensions
           ;( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( string-append ( car pair ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) )
           ;( for/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 1 ) ) splits )]) ( string-append ( car pair ) ( string ( string-ref ( cdr pair ) 1 ) ) ( string ( string-ref ( cdr pair ) 0 ) ) ( substring ( cdr pair ) 2 ( string-length ( cdr pair ) ) ) ) )
+          ;( for*/list ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )] [letter letters]) ( string-append ( car pair ) ( string letter ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) )
+          ;( for*/list ([pair splits] [letter letters]) ( string-append ( car pair ) ( string letter ) ( cdr pair ) ) ) ) ) )
           ;( for/fold ([acc '()]) ([pair ( filter ( lambda ( split ) ( > ( string-length ( cdr split ) ) 0 ) ) splits )]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( substring ( cdr pair ) 1 ( string-length ( cdr pair ) ) ) ) ) acc ) )
           ;( for/fold ([acc '()]) ([pair splits]) ( append ( for/list ([letter letters]) ( string-append ( car pair ) ( string letter ) ( cdr pair ) ) ) acc ) ) ) ) )
           
@@ -55,11 +57,10 @@
 
 ( define ( edits2 word )
    ; comprehensions
-   ( for*/list ([new-word ( edits1 word )] [new-edit ( edits1 new-word )]) new-edit ) )
-   ;( for/fold ([acc '()]) ([new-word ( edits1 word )]) ( append ( edits1 new-word ) acc ) ) )
+   ;( for*/list ([new-word ( edits1 word )] [new-edit ( edits1 new-word )]) new-edit ) )
 
    ;folding
-   ;( foldl ( lambda ( new-word lst ) ( append lst ( edits1 new-word ) ) ) '() ( edits1 word ) ) )
+   ( foldl ( lambda ( new-word lst ) ( append lst ( edits1 new-word ) ) ) '() ( edits1 word ) ) )
 
 ( define ( correction word )
    ( select-max ( candidates word ) P ) )

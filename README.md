@@ -4,20 +4,20 @@ The purpose of this repo is to study the differences in runtime between varying 
 # Implementations
 
 Below are all the implementations that were compared for this study along with a short description of each
-* `anchor-immutable` - experimental CLI implementation of Pyret that uses [Facebook's immutables collection](https://facebook.github.io/immutable-js/) as the underlying structure for lists and string dictionaries
-* `anchor-jslists` - similar to anchor-immutable, this implementation instead uses JavaScript's builtin arrays and objects instead and pushes elements when concatenating lists
-* `anchor-concat` - similar to `anchor-jslists` but instead uses the `concat` method of arrays when concatenating lists
-* `js-immutable` - JS implementation that uses Facebook's immutables
-* `js-lists `- JS implementation that uses the builtin arrays and objects, and pushes when concatenating lists
-* `js-concat` - similar to `js-lists` but uses the `concat` method when concatenating lists
-* `js-spell` - implemented by [Panagiotis Astithas](http://blog.astithas.com/2009/08/spell-checking-in-javascript.html), this JS implementation differs from others in how it generates both the 1 and 2 distance edits of words, removing the need of having intermediate lists to hold edited words
-* `pyret-immutable` - Pyret-of-today implementation that imports a JS file that uses Facebook's immutables
-* `pyret-jslists` - similar to `pyret-immutable` but instead uses JavaScript's builtin arrays and objects, pushing elements when concatenating lists
-* `pyret-concat` - similar to `pyret-jslists` but instead uses the `concat` method to concatenate lists
-* `pyret-original` - Pyret implementation that uses Pyret's builtin list and string dictionary
-* `python` - Norvig's implementation which all other implementations model after
-* `python-concat` - similar to Norvig's implementation but uses list concatenation instead of comprehension
-* `racket` - Racket implementation
+* [`anchor-immutable`](anchor-immutable.arr) - experimental CLI implementation of Pyret that uses [Facebook's immutables collection](https://facebook.github.io/immutable-js/) as the underlying structure for lists and string dictionaries
+* [`anchor-jslists`](anchor-jslists.arr) - similar to anchor-immutable, this implementation instead uses JavaScript's builtin arrays and objects instead and pushes elements when concatenating lists
+* [`anchor-concat`](anchor-concat.arr) - similar to `anchor-jslists` but instead uses the `concat` method of arrays when concatenating lists
+* [`js-immutable`](js-immutable.js) - JS implementation that uses Facebook's immutables
+* [`js-lists `](js-lists.js) - JS implementation that uses the builtin arrays and objects, and pushes when concatenating lists
+* [`js-concat`](js-concat.js) - similar to `js-lists` but uses the `concat` method when concatenating lists
+* [`js-spell`](js-spell.js) - implemented by [Panagiotis Astithas](http://blog.astithas.com/2009/08/spell-checking-in-javascript.html), this JS implementation differs from others in how it generates both the 1 and 2 distance edits of words, removing the need of having intermediate lists to hold edited words
+* [`pyret-immutable`](pyret-immutable.arr) - Pyret-of-today implementation that imports a JS file that uses Facebook's immutables
+* [`pyret-jslists`](pyret-jslists.arr) - similar to `pyret-immutable` but instead uses JavaScript's builtin arrays and objects, pushing elements when concatenating lists
+* [`pyret-concat`](pyret-concat) - similar to `pyret-jslists` but instead uses the `concat` method to concatenate lists
+* [`pyret-original`](pyret-original.arr) - Pyret implementation that uses Pyret's builtin list and string dictionary
+* [`python`](python.py) - Norvig's implementation which all other implementations model after
+* [`python-concat`](python-concat.py) - similar to Norvig's implementation but uses list concatenation instead of comprehension
+* [`racket`](racket.rkt) - Racket implementation
 
 The JS and immutable string dictionary and list libraries used by `anchor-jslists`, `anchor-concat`, and `anchor-immutable` are available in the `anchor-library/` directory.
 
@@ -93,12 +93,11 @@ While `.map.flatten()` and `.flatMap()` did not have much performance difference
 
 ### Racket Comprehensions and Folds
 
-Contrary to the Immutable collection above, Racket did not generate much difference in runtime whether it used folds or comprehensions when generating the list of 1 or 2 distance away words. For example, defining `edits2` to use comprehensions would yield the following
+One interesting comparison is Racket's and Python's performance difference when using comprehensions and folds, where Racket has a better runtime with folds, while Python performs better when using comprehensions. We implement Racket's `edits2` with comprehensions that match that of Python's, resulting in the following
 
 ```
 ( define ( edits2 word )
-  ( for/fold ([acc '()]) ([new-word ( edits1 word )])
-    ( append ( edits1 new-word ) acc ) ) )
+  ( for*/list ([new-word ( edits1 word )] [new-edit ( edits1 new-word )]) new-edit ) )
 ```
 
 while using folds would define `edits2` as
@@ -108,21 +107,21 @@ while using folds would define `edits2` as
   ( foldl ( lambda ( new-word lst ) ( append ( edits1 new-word ) lst ) ) `() ( edits1 word ) )
 ```
 
-Running the spell checker with comprehensions took an average of `0.36045` seconds per wrong word, while using folds took around `0.35223` seconds, less than a hundredth of a second difference. This contrasts with Python's difference in performance. By simply changing `edits2`  from using comprehensions
+Running the spell checker with comprehensions took an average of `0.502` seconds per wrong word, while using folds took around `0.35223` seconds. Therefore, utilizing folds benefits the Racket implementation by nearly `0.150` seconds. This contrasts with Python, where by simply changing `edits2`  from using comprehensions
 
 ```
 def edits2( word ):
   return (e2 for e1 in edits1(word) for e2 in edits1(e1))
 ```
 
-to using folds, or in the case of Python `reduce`,
+to using folds, or in this case of Python's `reduce`,
 
 ```
 def edits2( word ):
   return reduce( lambda acc, newWord: acc + edits1( newWord ), edits1( word ), [] )
 ```
 
-the overall runtime increases by a factor of 10, going from around `0.120` seconds to around `1.66` seconds per wrong word.
+the overall runtime increases by a factor of 10, going from around `0.120` seconds for comprehensions to around `1.66` seconds per wrong word with folds.
 
 ### Concatenation Order
 
