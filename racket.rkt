@@ -55,10 +55,11 @@
 
 ( define ( edits2 word )
    ; comprehensions
+   ( for*/list ([new-word ( edits1 word )] [new-edit ( edits1 new-word )]) new-edit ) )
    ;( for/fold ([acc '()]) ([new-word ( edits1 word )]) ( append ( edits1 new-word ) acc ) ) )
 
    ;folding
-   ( foldl ( lambda ( new-word lst ) ( append lst ( edits1 new-word ) ) ) '() ( edits1 word ) ) )
+   ;( foldl ( lambda ( new-word lst ) ( append lst ( edits1 new-word ) ) ) '() ( edits1 word ) ) )
 
 ( define ( correction word )
    ( select-max ( candidates word ) P ) )

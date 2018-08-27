@@ -2,27 +2,35 @@
   "requires": [],
   "provides": {
     "shorthands": {
-      "tva": ["tid", "a"]
+      "lOfA": ["tyapp", ["local", "List"], [["tid", "a"]]],
+      "lOfB": ["tyapp", ["local", "List"], [["tid", "b"]]],
+      "lOfInt": ["tyapp", ["local", "List"], ["Number"]],
+      "tva": ["tid", "a"],
+      "tvb": ["tid", "b"]
     },
     "values": {
-      "list": "tany",
-      "to-list": ["arrow", ["tany"], "tany"],
-      "at": ["arrow", ["tany", "Number"], "tany"],
-      "length": ["arrow", ["tany"], "Number"],
-      "contains": ["arrow", ["tany", "tany"], "Boolean"],
-      "map": ["arrow", ["tany", "tany"], "tany"],
-      "flat-map": ["arrow", ["tany", "tany"], "tany"],
-      "flatten": ["arrow", ["tany"], "tany"],
-      "slice": ["arrow", ["tany", "Number", "Number"], "tany"],
-      "push": ["arrow", ["tany", "tany"], "tany"],
-      "filter": ["arrow", ["tany", "tany"], "tany"],
-      "reduce": ["arrow", ["tany", "tany", "tany"], "tany"],
-      "sum": ["arrow", ["tany"], "Number"],
-      "max": ["arrow", ["tany"], "Number"],
-      "range": ["arrow", ["Number", "Number"], "tany"],
-      "empty-list": ["arrow", [], "tany"],
-      "concat": ["arrow", ["tany", "tany"], "tany"],
-      "is-list": ["arrow", ["tany"], "Boolean"]
+      "list": ["forall", ["a"], ["Maker", ["tid", "a"], "lOfA"]],
+      "to-list": ["forall", ["a"], ["arrow", ["lOfA"], "lOfA"]],
+      "at": ["forall", ["a"], ["arrow", ["lOfA", "Number"], "tva"]],
+      "length": ["forall", ["a"], ["arrow", ["lOfA"], "Number"]],
+      "contains": ["forall", ["a"], ["arrow", ["lOfA", "tva"], "Boolean"]],
+      "map": ["forall", ["a", "b"], ["arrow", ["lOfA", ["arrow", ["tva"], "tvb"]], "lOfB"]],
+      "flat-map": ["forall", ["a", "b"], ["arrow", ["lOfA", ["arrow", ["tva"], "tvb"]], "lOfB"]],
+      "flatten": ["forall", ["a"], ["arrow", ["lOfA"], "lOfA"]],
+      "slice": ["forall", ["a"], ["arrow", ["lOfA", "Number", "Number"], "lOfA"]],
+      "push": ["forall", ["a"], ["arrow", ["lOfA", "tva"], "lOfA"]],
+      "filter": ["forall", ["a"], ["arrow", ["lOfA", ["arrow", ["tva"], "Boolean"]], "lOfA"]],
+      "reduce": ["forall", ["a", "b"], ["arrow", ["lOfA", ["arrow", ["tvb", "tva"], "tvb"], "tvb"], "tvb"]],
+      "sum": ["arrow", ["lOfInt"], "Number"],
+      "min": ["arrow", ["lOfInt"], "Number"],
+      "max": ["arrow", ["lOfInt"], "Number"],
+      "range": ["arrow", ["Number", "Number"], "lOfInt"],
+      "empty-list": ["forall", ["a"], ["arrow", [], "lOfA"]],
+      "concat": ["forall", ["a"], ["arrow", ["lOfA", "lOfA"], "lOfA"]],
+      "is-list": ["forall", ["a"], ["arrow", ["lOfA"], "Boolean"]]
+    },
+    "datatypes": {
+      "List": ["data", "List", ["a"], [], {}]
     }
   }
 }
